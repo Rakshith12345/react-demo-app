@@ -62,7 +62,7 @@ function Electricity() {
         <Grid container spacing={3}>
 
           <Grid item xs={12} md={4} mt={10} align='center'>
-            <Paper elevation={4}  sx={{ height: "90%", width:'70%', backgroundColor: '#D3D3D3',padding:4,backgroundColor: 'rgba(255, 255, 255, 0.9)',borderRadius:4 }}>
+            <Paper elevation={4}  sx={{ height: "90%", width:'70%',padding:4,backgroundColor: 'rgba(255, 255, 255, 0.9)',borderRadius:4 }}>
               <Grid container justifyContent='center' alignItems='center' rowSpacing={2} columnSpacing={2} >
                  {/* Circle with Electricity Icon */}
                 <Grid item xs={12} align="center">
