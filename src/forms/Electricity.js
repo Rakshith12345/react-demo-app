@@ -8,7 +8,7 @@ function Electricity() {
   const [name, setName] = useState('');
   const [customerId, setCustomerId] = useState('');
   const [units, setUnits] = useState('');  // To store the number of units
-  const [message, setMessage] = useState('');
+  
   
   const [openDialog, setOpenDialog] = useState(false);  // To control the modal for the bill
   const [billAmount, setBillAmount] = useState(null);   // To store the generated bill amount
