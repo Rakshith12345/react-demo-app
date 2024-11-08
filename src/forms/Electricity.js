@@ -19,13 +19,13 @@ function Electricity() {
    
 
     if (units <= 100) {
-      const totalBill = units * 0.10
+      const totalBill = units * 6
       setBillAmount(totalBill.toFixed(2));
     } else if (units <= 200) {
-     const totalBill = 100 * 0.10 + (units - 100) * 0.15
+     const totalBill = 100 * 6 + (units - 100) * 8
       setBillAmount(totalBill.toFixed(2));
     } else {
-    const  totalBill = 100 * 0.10 + 100 * 0.15 + (units - 200) * 0.20
+    const  totalBill = 100 * 6 + 100 * 8 + (units - 200) * 12
       setBillAmount(totalBill.toFixed(2));
     }
 
