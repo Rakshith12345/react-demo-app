@@ -27,7 +27,7 @@ function Electricity() {
     // Set the final amount after penalty if any
     setFinalAmount(finalAmount.toFixed(2));
 
-},[paidOnTime])
+},[paidOnTime,billAmount])
 
    
 
