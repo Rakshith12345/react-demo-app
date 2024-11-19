@@ -169,7 +169,7 @@ function Electricity() {
                     type="submit"
                     fullWidth
                   >
-                    Generate Bills
+                    Generate the Bills
                   </Button>
                 </Grid>
               </Grid>
@@ -180,7 +180,7 @@ function Electricity() {
 
       {/* Dialog to display the generated bill */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle sx={{ textAlign: 'center', color: '#1976d2', fontWeight: 'bold' }}>Electricity Bill</DialogTitle>
+        <DialogTitle sx={{ textAlign: 'center', color: '#1976d2', fontWeight: 'bold' }}>Electricity Bills</DialogTitle>
         <DialogContent sx={{ padding: '20px', backgroundColor: '#f0f0f0' }}>
           <Typography variant="h6" sx={{ marginBottom: '15px', fontWeight: 'bold' }}>
             <strong>Customer Name:</strong> {name}
