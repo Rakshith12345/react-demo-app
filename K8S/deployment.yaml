@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: react-app
+  name: react-app-deployment
   namespace: react-app-namespace
 spec:
   replicas: 2
@@ -14,7 +14,7 @@ spec:
         app: react-app
     spec:
       containers:
-        - name: react-app
+        - name: react-app-container
           image: 908027375897.dkr.ecr.ap-south-1.amazonaws.com/front-end-repo:latest
           ports:
             - containerPort: 80
