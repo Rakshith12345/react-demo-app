@@ -103,7 +103,7 @@ function Electricity() {
                   </Box>
 
                   <Typography variant="h6" sx={{ color: 'black', fontWeight: 'bold' }}>
-                    Generate Electricity Bills
+                    Generate Electricity Bill
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
