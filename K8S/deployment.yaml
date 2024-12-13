@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
       - name: react-app-container
-        image: "908027375897.dkr.ecr.ap-south-1.amazonaws.com/front-end-repo:latest"
+        image: "908027375897.dkr.ecr.ap-south-1.amazonaws.com/my-repo:latest"
         ports:
         - containerPort: 80
