@@ -54,7 +54,7 @@ function Electricity() {
     // Round and set bill amount
     setBillAmount(totalBill.toFixed(2));
 
-    // Open dialog to show bill
+    // Open dialog to show bills
     setOpenDialog(true);
   };
 
