@@ -36,7 +36,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}  # Your private SSH key (stored as GitHub secret)
           port: 22  # Default SSH port
           script: |
-            # Pull the latest Docker image
+            # Pull the latests Docker image
             docker pull rakshithraghu/react-electricity-app:latest
             
             # Remove the old container (if it exists)
