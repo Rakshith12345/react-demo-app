@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { TextField, Button, Container, Typography, Box, Grid, Paper, Dialog, DialogActions, DialogContent, DialogTitle, RadioGroup, Radio, FormControlLabel, FormControl, setRef } from '@mui/material';
 import image from "../assets/electricss.avif";
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
-import {useNavigate} from "react-router-dom";
+
 
 function Electricity() {
   const [name, setName] = useState('');
@@ -15,7 +15,7 @@ function Electricity() {
   const [error, setError] = useState(''); // To store error messages
   const[result,setResult]=useState(null)
 
-  const navigate=useNavigate();
+
 
 
    // Calculate the bill
