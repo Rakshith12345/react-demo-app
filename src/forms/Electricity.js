@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TextField, Button, Container, Typography, Box, Grid, Paper, Dialog, DialogActions, DialogContent, DialogTitle, RadioGroup, Radio, FormControlLabel, FormControl, setRef } from '@mui/material';
+import { TextField, Button, Container, Typography, Box, Grid, Paper, Dialog, DialogActions, DialogContent, DialogTitle, RadioGroup, Radio, FormControlLabel, FormControl} from '@mui/material';
 import image from "../assets/electricss.avif";
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 
@@ -13,7 +13,7 @@ function Electricity() {
   const [billAmount, setBillAmount] = useState(null); // To store the generated bill amount
   const [finalAmount, setFinalAmount] = useState(null); // To store final amount after penalty if any
   const [error, setError] = useState(''); // To store error messages
-  const[result,setResult]=useState(null)
+
 
 
 
@@ -33,7 +33,7 @@ function Electricity() {
 
 },[paidOnTime,billAmount])
 
-const API_URL= 'http://43.205.178.69:8000/api/employees'
+const API_URL= 'http://java-load-balancer-729627150.ap-south-1.elb.amazonaws.com/api/employees'
 
    
 
@@ -64,7 +64,7 @@ const API_URL= 'http://43.205.178.69:8000/api/employees'
 
       const data=await response.json();
       window.location.href = "/Testform";
-      setResult(data)
+      // setResult(data)
 
     }catch(error){
 
