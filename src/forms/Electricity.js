@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { TextField, Button, Container, Typography, Box, Grid, Paper, Dialog, DialogActions, DialogContent, DialogTitle, RadioGroup, Radio, FormControlLabel, FormControl } from '@mui/material';
+import { TextField, Button, Container, Typography, Box, Grid, Paper, Dialog, DialogActions, DialogContent, DialogTitle, RadioGroup, Radio, FormControlLabel, FormControl} from '@mui/material';
 import image from "../assets/electricss.avif";
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
+
 
 function Electricity() {
   const [name, setName] = useState('');
@@ -12,6 +13,9 @@ function Electricity() {
   const [billAmount, setBillAmount] = useState(null); // To store the generated bill amount
   const [finalAmount, setFinalAmount] = useState(null); // To store final amount after penalty if any
   const [error, setError] = useState(''); // To store error messages
+
+
+
 
 
    // Calculate the bill
@@ -29,9 +33,11 @@ function Electricity() {
 
 },[paidOnTime,billAmount])
 
+const API_URL= 'http://java-load-balancer-729627150.ap-south-1.elb.amazonaws.com/api/employees'
+
    
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     setError(''); // Reset error message on form submit
 
@@ -39,6 +45,31 @@ function Electricity() {
     if (!customerId || !name || units <= 0) {
       setError('Please fill in all fields with valid values.');
       return;
+    }
+
+    try{
+      const response=await fetch(API_URL,{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+        },
+        body:JSON.stringify({name:name,email:customerId}),
+
+      });
+
+
+      if(!response.ok){
+        throw new Error('HTTP Error')
+      }
+
+      const data=await response.json();
+      window.location.href = "/Testform";
+      // setResult(data)
+
+    }catch(error){
+
+      console.error(error)
+
     }
 
    
@@ -55,7 +86,7 @@ function Electricity() {
     setBillAmount(totalBill.toFixed(2));
 
     // Open dialog to show bills
-    setOpenDialog(true);
+    // setOpenDialog(true);
   };
 
   const handleCloseDialog = () => {

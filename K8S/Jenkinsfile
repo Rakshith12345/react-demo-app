@@ -1,0 +1,93 @@
+pipeline {
+    agent any
+    
+    environment {
+        registry = "908027375897.dkr.ecr.ap-south-1.amazonaws.com/my-repo"
+        AWS_REGION = "ap-south-1"
+        AWS_ACCESS_KEY_ID = credentials('aws-credentials-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-credentials-id')
+        EKS_CLUSTER_NAME = "my-eks-cluster"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Rakshith12345/react-demo-app.git']])
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Get the current commit hash
+                    def commitHash = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    // Define the image tag with commit hash and 'latest'
+                    def imageTag = "${commitHash}"
+                    def latestTag = "latest"
+                    
+                    // Build the Docker image and tag it with both the commit hash and 'latest'
+                    docker.build("${registry}:${imageTag}")
+                    docker.build("${registry}:${latestTag}")
+                    
+                    // Store the tags for later use
+                    env.COMMIT_HASH = commitHash
+                    env.LATEST_TAG = latestTag
+                }
+            }
+        }
+
+        stage('Push to ECR') {
+            steps {
+                script {
+                    // Login to AWS ECR
+                    sh """
+                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${registry}
+                    """
+                    
+                    // Push the Docker image to ECR with both the commit hash and 'latest' tag
+                    sh """
+                    docker push ${registry}:${COMMIT_HASH}
+                    docker push ${registry}:${LATEST_TAG}
+                    """
+                }
+            }
+        }
+        
+        stage('Deploy on EKS') {
+            steps {
+                script {
+                    // Update kubeconfig to interact with your EKS cluster
+                    sh """
+                    aws eks --region ${AWS_REGION} update-kubeconfig --name ${EKS_CLUSTER_NAME}
+                    """
+                    
+                    // Replace the image tag in the deployment.yaml file
+                    sh """
+                    sed -i 's|<IMAGE_NAME>:<TAG>|${registry}:${LATEST_TAG}|g' k8s/deployment.yaml
+                    """
+                    
+                    // Check available nodes before deployment (optional but useful for debugging)
+                    sh "kubectl get nodes"
+                    
+                    // Apply Kubernetes manifests from the 'k8s' directory in your repository
+                    sh """
+                    kubectl apply -f k8s/namespace.yaml  # Create namespace if it doesn't exist
+                    kubectl apply -f k8s/deployment.yaml  # Deploy the app
+                    kubectl apply -f k8s/service.yaml     # Expose the app with a Service
+                    """
+                    
+                    // Wait for deployment to complete (optional)
+                    sh """
+                    kubectl rollout status deployment/react-demo-app
+                    """
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()  // Clean workspace after the build
+        }
+    }
+}
