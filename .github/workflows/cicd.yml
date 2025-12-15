@@ -53,7 +53,7 @@ jobs:
     - name: Deploy GREEN
       run: |
         sed -i "s|IMAGE_TAG|$IMAGE_TAG|g" K8S/deployment-green.yaml
-        kubectl apply -f k8s/deployment-green.yaml
+        kubectl apply -f K8S/deployment-green.yaml
 
     # 7️⃣ Wait for GREEN rollout
     - name: Wait for GREEN rollout
