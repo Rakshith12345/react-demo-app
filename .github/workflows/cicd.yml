@@ -1,4 +1,4 @@
-name: Build and Deploy React App to EKS
+name: Blue-Green Deploy to EKS
 
 on:
   push:
@@ -7,62 +7,82 @@ on:
 
 env:
   AWS_REGION: ap-south-1
-  ECR_REPOSITORY: react-frontend
-  EKS_CLUSTER_NAME: my-public-eks
-  IMAGE_NAME: react-frontend
+  CLUSTER_NAME: my-public-eks
+  ECR_REGISTRY: 908027375897.dkr.ecr.ap-south-1.amazonaws.com
+  ECR_REPO: react-frontend
+  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout source code
-      - name: Checkout code
-        uses: actions/checkout@v4
+    # 1️⃣ Checkout code
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      # 2️⃣ Configure AWS credentials
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+    # 2️⃣ AWS Credentials
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
 
-      # 3️⃣ Login to Amazon ECR
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+    # 3️⃣ Login to ECR
+    - name: Login to Amazon ECR
+      run: |
+        aws ecr get-login-password --region $AWS_REGION \
+        | docker login --username AWS --password-stdin $ECR_REGISTRY
 
-      # 4️⃣ Build Docker image
-      - name: Build Docker image
-        run: |
-          IMAGE_TAG=${GITHUB_SHA}
-          docker build \
-            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG \
-            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest \
-            .
+    # 4️⃣ Build & Push Docker Image
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t $ECR_REPO:$IMAGE_TAG .
+        docker tag $ECR_REPO:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
 
-      # 5️⃣ Push image to ECR
-      - name: Push Docker image to ECR
-        run: |
-          IMAGE_TAG=${GITHUB_SHA}
-          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
-          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+    # 5️⃣ Update kubeconfig
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig \
+          --region $AWS_REGION \
+          --name $CLUSTER_NAME
 
-      # 6️⃣ Update kubeconfig for EKS
-      - name: Update kubeconfig
-        run: |
-          aws eks update-kubeconfig \
-            --region ${{ env.AWS_REGION }} \
-            --name ${{ env.EKS_CLUSTER_NAME }}
+    # 6️⃣ Deploy GREEN version
+    - name: Deploy GREEN
+      run: |
+        sed -i "s|IMAGE_TAG|$IMAGE_TAG|g" k8s/deployment-green.yaml
+        kubectl apply -f k8s/deployment-green.yaml
 
-      # 7️⃣ Deploy new image to EKS
-      - name: Deploy to EKS
-        run: |
-          kubectl set image deployment/frontend-deploy \
-            react-frontend=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${GITHUB_SHA}
+    # 7️⃣ Wait for GREEN rollout
+    - name: Wait for GREEN rollout
+      run: |
+        kubectl rollout status deployment/frontend-green --timeout=180s
 
-      # 8️⃣ Verify rollout
-      - name: Verify deployment rollout
-        run: |
-          kubectl rollout status deployment/frontend-deploy
+    # 8️⃣ Switch traffic to GREEN
+    - name: Switch traffic to GREEN
+      run: |
+        kubectl patch svc react-service -p '
+        spec:
+          selector:
+            app: react-frontend
+            version: green
+        '
+
+    # 9️⃣ Verify Service
+    - name: Verify Service
+      run: |
+        kubectl get svc react-service
+        kubectl get pods -l version=green
+
+    # 🔙 10️⃣ Rollback to BLUE if anything fails
+    - name: Rollback to BLUE on failure
+      if: failure()
+      run: |
+        kubectl patch svc react-service -p '
+        spec:
+          selector:
+            app: react-frontend
+            version: blue
+        '
