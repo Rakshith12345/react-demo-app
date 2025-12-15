@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: react
-          image: 908027375897.dkr.ecr.ap-south-1.amazonaws.com/react-frontend:green
+          image: 908027375897.dkr.ecr.ap-south-1.amazonaws.com/react-frontend:PLACEHOLDER
           ports:
             - containerPort: 80
