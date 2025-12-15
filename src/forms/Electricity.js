@@ -169,7 +169,7 @@ function Electricity() {
                     type="submit"
                     fullWidth
                   >
-                    Generate Billss
+                   Generate the bills
                   </Button>
                 </Grid>
               </Grid>
