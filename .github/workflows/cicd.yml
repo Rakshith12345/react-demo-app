@@ -52,7 +52,7 @@ jobs:
     # 6️⃣ Deploy GREEN version
     - name: Deploy GREEN
       run: |
-        sed -i "s|IMAGE_TAG|$IMAGE_TAG|g" k8s/deployment-green.yaml
+        sed -i "s|IMAGE_TAG|$IMAGE_TAG|g" K8s/deployment-green.yaml
         kubectl apply -f k8s/deployment-green.yaml
 
     # 7️⃣ Wait for GREEN rollout
