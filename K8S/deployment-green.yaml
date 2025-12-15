@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-green
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: react-frontend
+      version: green
+  template:
+    metadata:
+      labels:
+        app: react-frontend
+        version: green
+    spec:
+      containers:
+        - name: react
+          image: 908027375897.dkr.ecr.ap-south-1.amazonaws.com/react-frontend:green
+          ports:
+            - containerPort: 80
