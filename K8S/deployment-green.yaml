@@ -17,5 +17,6 @@ spec:
       containers:
         - name: react
           image: 908027375897.dkr.ecr.ap-south-1.amazonaws.com/react-frontend:PLACEHOLDER
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
